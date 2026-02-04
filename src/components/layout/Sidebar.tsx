@@ -1,26 +1,44 @@
+import React, { useState } from "react";
 import {
   BarChart3,
   BoxIcon,
   Calendar,
-  CardSim,
+  CreditCard,
   ChevronDown,
   MessageCircle,
   Settings,
   ShoppingBag,
-  Text,
+  FileText,
   User,
   Zap,
+  LayoutDashboard,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import avatar from "../../assets/avatar1.jpg";
 
-const menuItems = [
-  {
-    name: "Dashboard",
-    icon: "LayoutDashboard",
-    label: "Dashboard",
-    active: true,
-    badge: "New",
-  },
+interface SubMenuItem {
+  id: string;
+  label: string;
+}
+
+interface MenuItem {
+  id: string;
+  icon: LucideIcon;
+  label: string;
+  badge?: string;
+  count?: string;
+  submenu?: SubMenuItem[];
+}
+
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
+  currentPage: string;
+  onPageChange: (id: string) => void;
+}
+
+const menuItems: MenuItem[] = [
+  { id: "dashboard", icon: LayoutDashboard, label: "Dashboard", badge: "New" },
   {
     id: "analytics",
     icon: BarChart3,
@@ -52,111 +70,165 @@ const menuItems = [
       { id: "customers", label: "Customers" },
     ],
   },
-  {
-    id: "Inventory",
-    icon: BoxIcon,
-    label: "Inventory",
-    count: "794",
-  },
-  {
-    id: "Transactions",
-    icon: CardSim,
-    label: "Transactions",
-  },
-  {
-    id: "Message",
-    icon: MessageCircle,
-    label: "Messages",
-    count: "12",
-  },
-  {
-    id: "Calendar",
-    icon: Calendar,
-    label: "Calendar",
-  },
-  {
-    id: "Reports",
-    icon: Text,
-    label: "Reports",
-  },
-  {
-    id: "settings",
-    icon: Settings,
-    label: "Settings",
-  },
+  { id: "inventory", icon: BoxIcon, label: "Inventory", count: "794" },
+  { id: "transactions", icon: CreditCard, label: "Transactions" },
+  { id: "messages", icon: MessageCircle, label: "Messages", count: "12" },
+  { id: "calendar", icon: Calendar, label: "Calendar" },
+  { id: "reports", icon: FileText, label: "Reports" },
+  { id: "settings", icon: Settings, label: "Settings" },
 ];
 
-function Sidebar() {
+const Sidebar: React.FC<SidebarProps> = ({
+  collapsed,
+  onToggle,
+  currentPage,
+  onPageChange,
+}) => {
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+
+  const handleItemClick = (item: MenuItem) => {
+    if (collapsed) {
+      onToggle();
+      setExpandedItem(item.id);
+    } else {
+      if (item.submenu) {
+        setExpandedItem(expandedItem === item.id ? null : item.id);
+      } else {
+        onPageChange(item.id);
+        setExpandedItem(null);
+      }
+    }
+  };
+
   return (
-    <div className="w-72 transition duration-300 ease-in-out bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col relative z-10">
+    <div
+      className={`${
+        collapsed ? "w-20" : "w-72"
+      } transition-all duration-300 ease-in-out bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col relative z-10`}
+    >
       <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-linear-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+        <div
+          className="flex items-center space-x-3 cursor-pointer"
+          onClick={onToggle}
+        >
+          <div className="w-10 h-10 bg-linear-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shrink-0">
             <Zap className="w-6 h-6 text-white" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-800 dark:text-white">
-              Nexus
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Admin Panel
-            </p>
-          </div>
+          {!collapsed && (
+            <div className="overflow-hidden whitespace-nowrap">
+              <h1 className="text-xl font-bold text-slate-800 dark:text-white">
+                Nexus
+              </h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Admin Panel
+              </p>
+            </div>
+          )}
         </div>
       </div>
+
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        {menuItems.map((item) => (
-          <div key={item.id}>
-            <button
-              className={`flex w-full items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:scale-95 ${
-                item.active
-                  ? "bg-linear-to-r from-blue-500 to-purple-600 text-white"
-                  : "text-slate-700 dark:text-slate-300"
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                {item.icon && <item.icon className="w-5 h-5" />}
-                <span className="font-medium">{item.label}</span>
-                {item.count && (
-                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">
-                    {item.count}
-                  </span>
+        {menuItems.map((item) => {
+          const isExpanded = expandedItem === item.id && !collapsed;
+          const isActive =
+            currentPage === item.id ||
+            item.submenu?.some((s) => s.id === currentPage);
+
+          return (
+            <div key={item.id} className="space-y-1">
+              <button
+                onClick={() => handleItemClick(item)}
+                className={`flex w-full items-center justify-between p-3 rounded-lg cursor-pointer transition-all active:scale-95 ${
+                  isActive && !item.submenu
+                    ? "bg-linear-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <item.icon className="w-5 h-5 shrink-0" />
+                  {!collapsed && (
+                    <span className="font-medium whitespace-nowrap">
+                      {item.label}
+                    </span>
+                  )}
+                </div>
+
+                {!collapsed && (
+                  <div className="flex items-center space-x-2">
+                    {item.count && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                        {item.count}
+                      </span>
+                    )}
+                    {item.badge && (
+                      <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
+                        {item.badge}
+                      </span>
+                    )}
+                    {item.submenu && (
+                      <ChevronDown
+                        className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${
+                          isExpanded ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </div>
                 )}
-              </div>
-              {item.badge && (
-                <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">
-                  {item.badge}
-                </span>
-              )}
+              </button>
 
               {item.submenu && (
-                <ChevronDown className="w-4 h-4 text-slate-400 transition-transform duration-200 transform rotate-0" />
+                <div
+                  className={`grid transition-all duration-300 ease-in-out ${
+                    isExpanded
+                      ? "grid-rows-[1fr] opacity-100"
+                      : "grid-rows-[0fr] opacity-0 pointer-events-none"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="ml-9 mt-1 space-y-1 pb-1">
+                      {item.submenu.map((sub) => (
+                        <button
+                          key={sub.id}
+                          onClick={() => onPageChange(sub.id)}
+                          className={`flex w-full items-center p-2 rounded-md text-sm transition-colors ${
+                            currentPage === sub.id
+                              ? "text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-900/20"
+                              : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                          }`}
+                        >
+                          {sub.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               )}
-            </button>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </nav>
+
       <div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50">
-        <div className="flex items-center space-x-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+        <div className="flex items-center space-x-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 overflow-hidden">
           <img
             src={avatar}
             alt="user"
-            className="w-10 h-10 rounded-full ring-2 ring-blue-500 object-cover"
+            className="w-10 h-10 rounded-full ring-2 ring-blue-500 object-cover shrink-0"
           />
-          <div className="flex-1 min-w-0">
+          {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="test-sm font-medium text-slate-800 dark:text-white truncate">
+              <p className="text-sm font-medium text-slate-800 dark:text-white truncate">
                 Azheev Alexandr
               </p>
-              <p className="text-2xs text-slate-500 dark:text-slate-400 truncate">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
                 Administrator
               </p>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Sidebar;
