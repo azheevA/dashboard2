@@ -1,106 +1,13 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import {
-  BarChart3,
-  BoxIcon,
-  Calendar,
-  CreditCard,
-  ChevronDown,
-  MessageCircle,
-  Settings,
-  ShoppingBag,
-  FileText,
-  User,
-  Zap,
-  LayoutDashboard,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { ChevronDown, Zap } from "lucide-react";
 import avatar from "../../assets/avatar1.jpg";
-
-interface SubMenuItem {
-  id: string;
-  label: string;
-  path: string;
-}
-
-interface MenuItem {
-  id: string;
-  icon: LucideIcon;
-  label: string;
-  path?: string;
-  badge?: string;
-  count?: string;
-  submenu?: SubMenuItem[];
-}
+import { menuItems } from "../../data";
 
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
 }
-
-const menuItems: MenuItem[] = [
-  {
-    id: "dashboard",
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    path: "/dashboard",
-    badge: "New",
-  },
-  {
-    id: "analytics",
-    icon: BarChart3,
-    label: "Analytics",
-    submenu: [
-      { id: "overview", label: "Overview", path: "/analytics/overview" },
-      { id: "reports-an", label: "Reports", path: "/analytics/reports" },
-      { id: "statistics", label: "Statistics", path: "/analytics/statistics" },
-    ],
-  },
-  {
-    id: "users",
-    icon: User,
-    label: "Users",
-    count: "2.4K",
-    submenu: [
-      { id: "all-users", label: "All Users", path: "/users/all" },
-      { id: "active-users", label: "Active Users", path: "/users/active" },
-      { id: "user-roles", label: "User Roles", path: "/users/roles" },
-    ],
-  },
-  {
-    id: "ecommerce",
-    icon: ShoppingBag,
-    label: "E-Commerce",
-    submenu: [
-      { id: "products", label: "Products", path: "/ecommerce/products" },
-      { id: "orders", label: "Orders", path: "/ecommerce/orders" },
-      { id: "customers", label: "Customers", path: "/ecommerce/customers" },
-    ],
-  },
-  {
-    id: "inventory",
-    icon: BoxIcon,
-    label: "Inventory",
-    path: "/inventory",
-    count: "794",
-  },
-  {
-    id: "transactions",
-    icon: CreditCard,
-    label: "Transactions",
-    path: "/transactions",
-  },
-  {
-    id: "messages",
-    icon: MessageCircle,
-    label: "Messages",
-    path: "/messages",
-    count: "12",
-  },
-  { id: "calendar", icon: Calendar, label: "Calendar", path: "/calendar" },
-  { id: "reports", icon: FileText, label: "Reports", path: "/reports" },
-  { id: "settings", icon: Settings, label: "Settings", path: "/settings" },
-];
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
   const location = useLocation();
@@ -117,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
 
   return (
     <div
-      className={`${collapsed ? "w-20" : "w-72"} transition-all duration-300 ease-in-out bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col relative z-10`}
+      className={`${collapsed ? "w-20" : "w-72"} transition-all duration-300 ease-in-out bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col relative z-10 h-screen`}
     >
       <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
         <div

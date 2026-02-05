@@ -9,20 +9,20 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-all duration-500">
-        <div className="flex h-screen overflow-hidden">
-          <Sidebar
-            collapsed={sideBarCollapsed}
-            onToggle={() => setSideBarCollapsed(!sideBarCollapsed)}
-          />
-          <div className="flex-1 flex-col overflow-hidden">
-            <Header />
-            <main className="flex-1 overflow-y-auto bg-transparent">
-              <div className="p-6">
-                <AppRouter />
-              </div>
-            </main>
-          </div>
+      <div className="h-screen w-full bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden flex transition-all duration-500">
+        <Sidebar
+          collapsed={sideBarCollapsed}
+          onToggle={() => setSideBarCollapsed(!sideBarCollapsed)}
+        />
+
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
+          <Header />
+
+          <main className="flex-1 overflow-y-auto custom-scrollbar bg-transparent p-6">
+            <div className=" mx-auto">
+              <AppRouter />
+            </div>
+          </main>
         </div>
       </div>
     </Router>

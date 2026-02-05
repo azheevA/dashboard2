@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { PageWrapper } from "./shapes/UI/motion";
-import Dashboard from "./components/Dashboard/dashboard";
+import Dashboard from "./components/Dashboard/Dashboard";
 
 const AppRouter: React.FC = () => {
   const location = useLocation();
